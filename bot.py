@@ -3,6 +3,7 @@ from threading import Thread
 from datetime import datetime
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+import asyncio
 import os
 
 TOKEN = os.getenv("BOT_TOKEN")
@@ -23,25 +24,32 @@ def home():
 def run_flask():
     app.run(host="0.0.0.0", port=10000)
 
-def keep_alive():
-    server = Thread(target=run_flask)
-    server.daemon = True
-    server.start()
+def start_flask():
+    thread = Thread(target=run_flask)
+    thread.daemon = True
+    thread.start()
 
 # ---------------------------- START BOT ----------------------------
 
 async def start_bot():
-    app_bot = (
+    application = (
         ApplicationBuilder()
         .token(TOKEN)
         .build()
     )
 
-    app_bot.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("start", start))
 
-    await app_bot.run_polling()
+    print(">>> BOT INICIADO EN RENDER 🚀")
+    await application.run_polling()
+
+def main():
+    start_flask()
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(start_bot())
+
+# ---------------------------- RUN ----------------------------
 
 if __name__ == "__main__":
-    keep_alive()
-    import asyncio
-    asyncio.run(start_bot())
+    main()

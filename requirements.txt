@@ -1,7 +1,7 @@
 flask
 websockets
 websocket-client
-deriv-api
+deriv_api
 requests
 python-telegram-bot==13.15
 pandas

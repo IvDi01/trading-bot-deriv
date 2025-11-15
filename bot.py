@@ -1,43 +1,26 @@
-from flask import Flask
-from threading import Thread
-from datetime import datetime
-from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 import os
 import asyncio
+from telegram import Update
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
-TOKEN = os.getenv("BOT_TOKEN")
+TOKEN = os.getenv("BOT_TOKEN")  # Render env variable
 
-# ---------------------------- BOT HANDLERS ----------------------------
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("¡Bot de Deriv funcionando correctamente en Render! 🚀")
+    await update.message.reply_text("Hola, ¡el bot ya está funcionando en Render! 🚀")
 
-# ---------------------------- FLASK KEEPALIVE ----------------------------
 
-app = Flask(__name__)
+async def main():
+    if TOKEN is None:
+        raise ValueError("❌ ERROR: La variable de entorno BOT_TOKEN no está configurada.")
 
-@app.route("/")
-def home():
-    return "Trading Bot Deriv está corriendo OK en Render - " + datetime.utcnow().isoformat()
+    app = ApplicationBuilder().token(TOKEN).build()
 
-def run_flask():
-    app.run(host="0.0.0.0", port=10000)
+    app.add_handler(CommandHandler("start", start))
 
-def keep_alive():
-    server = Thread(target=run_flask)
-    server.daemon = True
-    server.start()
+    print("Bot iniciado en Render... 🚀")
+    await app.run_polling()
 
-# ---------------------------- START BOT ----------------------------
-
-async def start_bot():
-    application = ApplicationBuilder().token(TOKEN).build()
-
-    application.add_handler(CommandHandler("start", start))
-
-    await application.run_polling(close_loop=False)
 
 if __name__ == "__main__":
-    keep_alive()
-    asyncio.run(start_bot())
+    asyncio.run(main())

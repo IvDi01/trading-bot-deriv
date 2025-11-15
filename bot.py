@@ -32,11 +32,11 @@ def keep_alive():
 # ---------------------------- START BOT ----------------------------
 
 async def start_bot():
-    app_bot = ApplicationBuilder().token(TOKEN).build()
+    application = ApplicationBuilder().token(TOKEN).build()
 
-    app_bot.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("start", start))
 
-    await app_bot.run_polling()
+    await application.run_polling(close_loop=False)
 
 if __name__ == "__main__":
     keep_alive()
